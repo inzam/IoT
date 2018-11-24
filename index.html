@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Smart Drain</title>
+
+    <style>
+        table, th, td {
+            border: 1px solid black;
+        }
+		td {
+			width: 100px;
+		}
+		table {
+			margin-top:200px;
+		}
+		
+    </style>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <button type="button" id="myBtn" onclick="loadDoc()">Request data</button>
+    
+    <!--table-->
+<table align = "center">
+    <tr>
+		<th>Device ID</th>
+		<th>Date</th>
+		<th>Time</th>
+        <th>Junction 1</th>
+        <th>Junction 2</th>
+        <th>Junction 3</th>
+        <th>Rainfall</th>		
+    </tr>
+	<tbody align="center">
+    <tr>
+		<td id="device"></td>
+		<td id="date"></td>
+		<td id="time"></td>
+        <td id="j1"></td>
+        <td id="j2"></td>
+        <td id="j3"></td>
+        <td id="j4"></td>		
+    </tr>
+	</tbody>
+</table>
+<p id="alert"></p>
+<!-- read and deliver data to table -->
+ <script>
+    //  function to check junction status
+    function checkJunction(junction){
+            if(junction>=3){
+            setTimeout(function(){
+                if(junction>=3){
+                    alert("Junction "+junction+" is flooded!!");
+                    }
+                },5000);
+            }
+        } 
+    // fucntion to plot junction data
+    function plottable(jncnm,jncvl){
+        document.getElementById(jncnm).innerHTML = jncvl;
+
+            if(jncvl<3){
+                document.getElementById(jncnm).style.backgroundColor = "green";
+            }else if(jncvl==3){
+                document.getElementById(jncnm).style.backgroundColor = "yellow";
+            }else{
+            document.getElementById(jncnm).style.backgroundColor = "red";
+            }
+        };
+
+     var junction1;
+     var junction2;
+     var junction3;
+     var junction4;
+
+    function loadDoc(){
+        setInterval(function(){            
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+
+                    fileLines = this.responseText.split("\n");
+                    var str = fileLines[fileLines.length-2];
+                    var data = str.toString().split(" ");
+
+                    var date = data[0];
+                    var time = data[1];
+                    var frmt = data[2];
+
+                    var junctions = data[3];
+                    var junctionData = junctions.split("|");
+
+                    var j1 = junctionData[0];
+                    var j2 = junctionData[1];
+                    var j3 = junctionData[2];
+                    var j4 = junctionData[3];   
+
+                    junction1 =Number(j1); name1 = "j1";
+                    junction2 = Number(j2); name2 = "j2";
+                    junction3 = Number(j3); name3 = "j3";
+                    junction4 = Number(j4); name4 = "j4";
+
+                    var device = data[4];
+
+                    document.getElementById("device").innerHTML = device;
+                    document.getElementById("date").innerHTML = date;
+                    document.getElementById("time").innerHTML = time+" "+frmt;
+
+                        // call function plottable to plot value in table 
+                            plottable(name1,junction1);
+                            plottable(name2,junction2);
+                            plottable(name3,junction3);
+                            plottable(name4,junction4);
+                        //  call function checkJunction to check for junction status   
+                            checkJunction(junction1);
+                            checkJunction(junction2);
+                            checkJunction(junction3);
+                            checkJunction(junction4);
+            }
+        };
+        xhttp.open("GET","drain.txt",true);       
+        xhttp.send();
+        }, 3000);
+
+        
+    }
+    </script>
+
+<!-- modal -->
+<div class="modal fade" id="overlay">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">Check Table</h4>
+            </div>
+            <!-- <div class="modal-body">
+              <p>Context here</p>
+            </div> -->
+          </div>
+        </div>
+      </div>
+
+<script>
+setInterval(function() {
+        $('#overlay').modal('show');
+
+        setTimeout(function() {
+            $('#overlay').modal('hide');
+    }, 3000);
+}, 10000);
+
+</script>
+
+
+</body>
+</html>
