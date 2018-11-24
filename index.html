@@ -53,11 +53,11 @@
 <!-- read and deliver data to table -->
  <script>
     //  function to check junction status
-    function checkJunction(junction){
+    function checkJunction(junction, juncName){
             if(junction>=3){
             setTimeout(function(){
                 if(junction>=3){
-                    alert("Junction "+junction+" is flooded!!");
+                    alert("Junction "+juncName+" is flooded!!");
                     }
                 },5000);
             }
@@ -119,10 +119,10 @@
                             plottable(name3,junction3);
                             plottable(name4,junction4);
                         //  call function checkJunction to check for junction status   
-                            checkJunction(junction1);
-                            checkJunction(junction2);
-                            checkJunction(junction3);
-                            checkJunction(junction4);
+                            checkJunction(junction1,name1);
+                            checkJunction(junction2,name2);
+                            checkJunction(junction3,name3);
+                            checkJunction(junction4,name4);
             }
         };
         xhttp.open("GET","drain.txt",true);       
